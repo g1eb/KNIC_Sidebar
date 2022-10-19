@@ -11,34 +11,36 @@ import InputAdornment from "@material-ui/core/InputAdornment";
 export default props => {
   return (
     <Menu>
-      <div>
-      <a className="menu-item">
-      <b>Current Task/State</b>
-      </a>
-      </div>
+    <div class="wrapper">
+        <div class="container" id="current task/state">
+        <a className="menu-item">
+        <b>Current Task/State</b>
+        </a>
+        </div>
 
-      <div>
+      <div class="container" id="General Q&A">
       <a className="menu-item">
         <b>General Q&A</b>
       </a>
       </div>
 
-      <div>
-      <a className="menu-item">
-      <b>Situation Specific Q&A</b>
-      </a>
+      <div class="container" id="Specific Q&A">
+        <a className="menu-item">
+        <b>Situation Specific Q&A</b>
+        </a>
       </div>
 
-      <div>
+      <div class="search-container" id="search">
       <a className="menu-item" id="personalized_queries">
          <TextField
         type="search"
         variant="outlined"
         margin="normal"
+        style={{backgroundColor: 'white'}}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <SearchIcon style={{ color: 'white' }}/>
+              <SearchIcon style={{ color: 'black'}}/>
             </InputAdornment>
           )
         }}
@@ -46,15 +48,18 @@ export default props => {
       </a>
       </div>
       
-      <div id="query_history"> 
+      <div class="query-history-container" id="query_history"> 
       <a className="menu-item"></a>
       <Button style={{
         borderRadius: 10,
         backgroundColor:  "#ffc72c",
-        fontSize: "18px",
-        color: "black"}} variant="contained" size="small" 
+        fontSize: "18px", fontWeight: 700,
+        maxWidth: '10em', maxHeight: '5em', 
+        minWidth: '5em', minHeight: '2.5em',
+        color: "black"}} variant="contained" size="medium" 
           onClick={() => {
-          alert('Query History Popup Somehow');}}>Query History</Button>
+          alert('Show Query History Somehow');}}>Query History</Button>
+      </div>
       </div>
     </Menu>
   );
