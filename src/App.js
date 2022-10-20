@@ -6,13 +6,15 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
+//import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 // import ErrorIcon from '@mui/icons-material/Error';
 //import CancelIcon from '@mui/icons-material/Cancel';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import '@fontsource/roboto/300.css';
 
 const PageContents = () => (
@@ -22,10 +24,6 @@ const PageContents = () => (
     </p>
 
   </div>
-);
-
-const QueryHistoryButton = () => (
-    <Button variant="contained">Show Query History</Button>
 );
 
 const EasyAskButton = (props) => (
@@ -78,6 +76,32 @@ const SituationSpecificQA = () => (
 </Accordion>
 );
 
+const QueryHistoryTab = () => (
+<Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
+    <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
+    <QAPair qtext="I asked this query before" atext="Sample answer"/>
+    <QAPair qtext="I also asked this one" atext="Sample answer"/>
+  </Stack>
+  </Stack>
+);
+
+const QAList = (props) => (
+  <Stack spacing={1}>
+    <Question text={props.qtext}/>
+    {props.answers.map(answer => {
+        return <Answer text={answer} />;
+      })}
+  </Stack>
+);
+
+const QATab = () => (
+    <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
+    <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
+        <QAList qtext="Sample query text" answers={['answer #1', 'answer #2']}/>
+  </Stack>
+  </Stack>
+);
+
 const CustomSearchField = () => (
     <TextField
         type="search"
@@ -114,15 +138,47 @@ const CurrentState = () => (
   </Accordion>
 );
 
+function TabMaster() {
+  const [value, setValue] = React.useState(0);
+
+  function handleChange(event, newValue) {
+    setValue(newValue);
+  }
+
+  return (
+  <div>
+      <Box centered sx={{alignItems: 'center', width: 400}}>
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          centered
+        >
+          <Tab label="Main" id="simple-tabpanel-0" />
+          <Tab label="Q & A" id="simple-tabpanel-1" />
+          <Tab label="Query History" id="simple-tabpanel-2" />
+        </Tabs>
+      </Box>
+      <div role="tabpanel" hidden={value !== 0} id={`simple-tabpanel-0`}>
+        <Sidebar />
+      </div>
+      <div role="tabpanel" disabled hidden={value !== 1} id={`simple-tabpanel-1`}>
+        <QATab />
+      </div>
+      <div role="tabpanel" hidden={value !== 2} id={`simple-tabpanel-2`}>
+        <QueryHistoryTab />
+      </div>
+      </div>
+  );
+}
+
 const Sidebar = () => (
 
-  <Stack bgcolor="lightgray" spacing={2} className="Sidebar" style={{padding: "10px"}}>
+  <Stack bgcolor="lightgray" spacing={2} className="Sidebar" style={{padding: "10px", margin: "10px", width: 400}}>
         <CurrentState />
         <EasyAskBoxGreen />
         <EasyAskBoxRed />
         <SituationSpecificQA />
         <CustomSearchField />
-        <QueryHistoryButton />
   </Stack>
 );
 
@@ -130,7 +186,7 @@ export default function App() {
 
   return (
     <Stack direction="row" spacing={2}>
-      <Sidebar />
+      <TabMaster />
       <PageContents />
     </Stack>
   );
