@@ -13,7 +13,7 @@ import ButtonGroup from '@mui/material/ButtonGroup';
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
-// import ErrorIcon from '@mui/icons-material/Error';
+import ErrorIcon from '@mui/icons-material/Error';
 //import CancelIcon from '@mui/icons-material/Cancel';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
@@ -129,6 +129,7 @@ function EasyAskBox({errorState, stateChanger, displayQuestion}) {
         const buttons = easyAskQuestions.filter(eaq => eaq.status === 'error');
         return(
           <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
+            <Stack alignItems="center"><ErrorIcon /></Stack>
             {buttons.map(eaq => eaq.createButton(displayQuestion))}
             <ChangeStateButton color='success' text={"I'm not having any problems."} onClick={() => stateChanger(0)} />
           </Stack>
