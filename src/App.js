@@ -2,7 +2,7 @@ import './App.css';
 import React from "react";
 import { useCallback } from "react";
 import Stack from '@mui/material/Stack';
-import Grid from '@mui/material/Grid';
+//import Grid from '@mui/material/Grid';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -71,6 +71,7 @@ const Answer = (props) => (
     <div style={{fontStyle: 'italic'}}>A: {props.text}</div>
 );
 
+// X button is not implemented :)
 const FullAnswer = (props) => (
 <Stack direction='row' spacing={1} justifyContent='space-between'>
     <Answer text={props.text} />
@@ -105,6 +106,7 @@ function QAPair({qtext, atext, displayQuestion}) {
 
 function SituationSpecificQA({displayQuestion}) {
 
+// considered maxHeight: 400, overflow:'auto'
 return(
   <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
     <div style={{marginBottom: "10px", textAlign: "center"}}>Situation-specific Q&A</div>
