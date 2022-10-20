@@ -1,36 +1,137 @@
 import './App.css';
 import React from "react";
-import Sidebar from './Components/Sidebar';
+import Stack from '@mui/material/Stack';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
+import SearchIcon from '@mui/icons-material/Search';
+import TextField from "@material-ui/core/TextField";
+import InputAdornment from "@material-ui/core/InputAdornment";
+// import ErrorIcon from '@mui/icons-material/Error';
+//import CancelIcon from '@mui/icons-material/Cancel';
 import '@fontsource/roboto/300.css';
-// import GitHubIcon from '@mui/icons-material/GitHub';
 
+const PageContents = () => (
+  <div style={{color: "blueGrey", padding: "10px"}}>
+    <p>
+      RTG boilerplate goes here
+    </p>
 
+  </div>
+);
 
+const QueryHistoryButton = () => (
+    <Button variant="contained">Show Query History</Button>
+);
+
+const EasyAskButton = (props) => (
+    <Button variant="outlined" color={props.color} key={props.key} style={{color: props.color}} >{props.text}</Button>
+);
+
+const EasyAskBoxGreen = () => (
+  <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
+    <EasyAskButton color='success' key="whatsnext" text={"What's next?"} />
+    <EasyAskButton color='success' key="lookright" text={"Does this look right?"} />
+    <EasyAskButton color='error' key="problem" text={"I'm having a problem."} />
+  </Stack>
+);
+
+const EasyAskBoxRed = () => (
+  <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
+    <EasyAskButton color='error' key="whatswrong" text={"What's wrong?"} />
+    <EasyAskButton color='error' key="fix" text={"How do I fix this?"} />
+    <EasyAskButton color='error' key="looklike" text={"What should this look like?"} />
+    <EasyAskButton color='success' key="problem" text={"I'm not having any problems."} />
+  </Stack>
+);
+
+const Question = (props) => (
+    <div style={{fontWeight: 'bold'}}>Q: {props.text}</div>
+);
+
+const Answer = (props) => (
+    <div style={{fontStyle: 'italic'}}>A: {props.text}</div>
+);
+
+const QAPair = (props) => (
+  <Stack spacing={1}>
+    <Question text={props.qtext}/>
+    <Answer text={props.atext}/>
+  </Stack>
+);
+
+const SituationSpecificQA = () => (
+<Accordion>
+  <AccordionSummary expandIcon={<ExpandMoreIcon />} expanded='true'>
+     {"Situation-specific Q&A"}
+  </AccordionSummary>
+  <AccordionDetails>
+  <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
+    <QAPair qtext="How do I install PyTorch?" atext="Sample answer"/>
+    <QAPair qtext="How do I check if PyTorch is installed?" atext="Sample answer"/>
+  </Stack>
+  </AccordionDetails>
+</Accordion>
+);
+
+const CustomSearchField = () => (
+    <TextField
+        type="search"
+        variant="outlined"
+        margin="normal"
+        style={{backgroundColor: 'white'}}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon style={{ color: 'black'}}/>
+            </InputAdornment>
+          )
+        }}
+    />
+);
+
+const CurrentStateItem = (props) => (
+    <Button variant="outlined" color={props.color} key={props.key} style={{color: props.color}} >{props.text}</Button>
+
+);
+
+const CurrentState = () => (
+  <Accordion>
+  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+     Current State
+  </AccordionSummary>
+  <AccordionDetails>
+    <Stack bgcolor="white" spacing={1} style={{padding: "10px", borderRadius: '16px'}}>
+        <CurrentStateItem color='primary' key='dunno' text='node'/>
+        <CurrentStateItem color='primary' key='dunno' text='node'/>
+        <CurrentStateItem color='primary' key='dunno' text='node'/>
+    </Stack>
+  </AccordionDetails>
+  </Accordion>
+);
+
+const Sidebar = () => (
+
+  <Stack bgcolor="lightgray" spacing={2} className="Sidebar" style={{padding: "10px"}}>
+        <CurrentState />
+        <EasyAskBoxGreen />
+        <EasyAskBoxRed />
+        <SituationSpecificQA />
+        <CustomSearchField />
+        <QueryHistoryButton />
+  </Stack>
+);
 
 export default function App() {
-  return (<div className="App" id="outer-container">
-    <Sidebar pageWrapId={'page-wrap'} outerContainerId={'outer-container'} />
-    <div id="page-wrap">
-    
-    <h1>Reader Translator Generator (RTG)</h1>
-    <h4> Reader Translator Generator (RTG)
-    RTG is a neural machine translation toolkit.
-    
-    This notebook walks you through: Setup of RTG, Preparing a parallel dataset for DE-EN, tokenization, tests etc
-    Training Transformer NMT using RTG.
-    </h4>
 
-    <body>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
-    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, 
-    vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
-    </body>
-
-    
-</div>
-</div>
-
+  return (
+    <Stack direction="row" spacing={2}>
+      <Sidebar />
+      <PageContents />
+    </Stack>
   );
-}
+};
