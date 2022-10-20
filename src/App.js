@@ -2,19 +2,23 @@ import './App.css';
 import React from "react";
 import { useCallback } from "react";
 import Stack from '@mui/material/Stack';
+import Grid from '@mui/material/Grid';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
-//import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 // import ErrorIcon from '@mui/icons-material/Error';
 //import CancelIcon from '@mui/icons-material/Cancel';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import '@fontsource/roboto/300.css';
@@ -67,6 +71,17 @@ const Answer = (props) => (
     <div style={{fontStyle: 'italic'}}>A: {props.text}</div>
 );
 
+const FullAnswer = (props) => (
+<Stack direction='row' spacing={1} justifyContent='space-between'>
+    <Answer text={props.text} />
+    <ButtonGroup orientation='vertical'>
+    <Button variant="outlined" color="error"><HighlightOffIcon/></Button>
+    <Button variant="outlined"><QuestionMarkIcon/></Button>
+    <Button variant="outlined"><ManageSearchIcon/></Button>
+    </ButtonGroup>
+  </Stack>
+);
+
 function QAPair({qtext, atext, displayQuestion}) {
 
     var shortText = atext
@@ -74,13 +89,16 @@ function QAPair({qtext, atext, displayQuestion}) {
         shortText = atext.substring(0, 100) + "..."
     }
 
+    // ButtonGroup makes the single button not get mega tall
     return (
       <Stack direction='row' spacing={1} justifyContent='space-between'>
       <Stack spacing={1}>
         <Question text={qtext}/>
         <Answer text={shortText}/>
       </Stack>
+      <ButtonGroup orientation='vertical'>
       <Button variant="outlined" onClick={() => displayQuestion(qtext)}><ZoomInIcon /></Button>
+      </ButtonGroup>
       </Stack>
     );
 }
@@ -100,7 +118,7 @@ return(
 function QueryHistoryTab({questionHistory, displayQuestion}) {
 
 return (
-  <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
+  <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
     <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
     {questionHistory.map(qr => <QAPair qtext={qr.qtext} atext={qr.getFirstAnswer()} displayQuestion={displayQuestion}/>)}
   </Stack>
@@ -112,7 +130,7 @@ const QAList = (props) => (
   <Stack spacing={1}>
     <Question text={props.qtext}/>
     {props.answers.map(answer => {
-        return <Answer text={answer} />;
+        return <FullAnswer text={answer} />;
       })}
   </Stack>
 );
@@ -122,7 +140,9 @@ const QAList = (props) => (
 function getFakeAnswers(qtext) {
     var answers=['answer #1', 'answer #2']
     if (qtext === "How do I install PyTorch?") {
-        answers=['hardcoded answer #1', 'hardcoded answer #2', 'hardcoded answer #3']
+        answers=['Open Anaconda manager and run the command as it specified in the installation instructions. Copy `conda install pytorch torchvision torchaudio cpuonly -c pytorch`.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        'Venenatis tellus in metus vulputate eu scelerisque. Penatibus et magnis dis parturient montes. Scelerisque in dictum non consectetur a. Morbi leo urna molestie at elementum eu facilisis. Lectus sit amet est placerat in egestas. Purus sit amet luctus venenatis lectus magna fringilla urna porttitor. Nisl rhoncus mattis rhoncus urna neque viverra justo nec. Dignissim cras tincidunt lobortis feugiat vivamus. Elit duis tristique sollicitudin nibh sit. Id diam maecenas ultricies mi eget mauris pharetra et. At augue eget arcu dictum varius duis at consectetur. Est ante in nibh mauris cursus mattis molestie a. Nisl nunc mi ipsum faucibus. Aliquet enim tortor at auctor urna nunc. Vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Lacus vel facilisis volutpat est.']
     } else if (qtext === "n/a") {
         return ["n/a"]
     }
@@ -149,7 +169,7 @@ class QueryAndResponse {
 function QATab({question_info}) {
 
     return (
-        <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
+        <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
         <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
             <QAList qtext={question_info.qtext} answers={question_info.answers}/>
       </Stack>
@@ -263,7 +283,7 @@ function MainDisplayPane({displayQuestion}) {
     }, [setErrorState]);
 
     return (
-     <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
+     <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
         <CurrentState />
         <EasyAskBox errorState={errorState} stateChanger={wrapperSetErrorState} displayQuestion={displayQuestion}/>
         <SituationSpecificQA displayQuestion={displayQuestion}/>
