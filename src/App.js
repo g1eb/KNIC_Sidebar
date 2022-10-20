@@ -291,15 +291,17 @@ function TabMaster() {
   function displayQuestion(qr) {
     setTabValue(1); // 1 is just the hard-coded value of the Q & A pane
     setQIValue(qr);
-    var seenAlready = false;
+    var seenAlready = -1;
     questionHistory.forEach(function (item, index) {
         if (qr.matches(item)) {
-            seenAlready = true;
+            seenAlready = index;
         }
     });
-    if (!seenAlready) {
-        questionHistory.unshift(qr);
+    if (seenAlready >= 0) {
+        // Remove it so we can put it at the top of the list
+        questionHistory.splice(seenAlready, 1);
     }
+    questionHistory.unshift(qr);
     setQHValue(questionHistory);
   }
 
