@@ -30,86 +30,6 @@ const PageContents = () => (
   </div>
 );
 
-function EasyAskButton ({color, key, text, displayQuestion}) {
-return(
-    <Button variant="outlined" color={color} key={key} style={{color: color}} onClick={() => displayQuestion(createFakeQR(text))}>{text}</Button>
-    );
-}
-
-function ChangeStateButton ({color, key, text, onClick}) {
-return(
-    <Button variant="contained" color={color} key="changestate" style={{color: color}} onClick={onClick}>{text}</Button>
-    );
-}
-
-function EasyAskBox({errorState, stateChanger, displayQuestion}) {
-if (errorState) {
-return(
-  <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
-    <EasyAskButton color='error' key="whatswrong" text={"What's wrong?"} displayQuestion={displayQuestion}/>
-    <EasyAskButton color='error' key="fix" text={"How do I fix this?"} displayQuestion={displayQuestion}/>
-    <EasyAskButton color='error' key="looklike" text={"What should this look like?"} displayQuestion={displayQuestion}/>
-    <ChangeStateButton color='success' text={"I'm not having any problems."} onClick={() => stateChanger(0)} />
-  </Stack>
-  );
-} else {
-return (
-  <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
-    <EasyAskButton color='success' key="whatsnext" text={"What's next?"} displayQuestion={displayQuestion}/>
-    <EasyAskButton color='success' key="lookright" text={"Does this look right?"} displayQuestion={displayQuestion}/>
-    <ChangeStateButton color='error' text={"I'm having a problem."} onClick={() => stateChanger(1)}/>
-  </Stack>
-  );
-  }
-}
-
-const Question = (props) => (
-    <div style={{fontWeight: 'bold'}}>Q: {props.text}</div>
-);
-
-const Answer = (props) => (
-    <div style={{fontStyle: 'italic'}}>A: {props.text}</div>
-);
-
-// X button is not implemented :)
-const FullAnswer = (props) => (
-<Stack direction='row' spacing={1} justifyContent='space-between'>
-    <Answer text={props.text} />
-    <ButtonGroup orientation='vertical'>
-    <Button variant="outlined" color="error" onClick={props.removeHandler}><HighlightOffIcon/></Button>
-    <Button variant="outlined"><QuestionMarkIcon/></Button>
-    <Button variant="outlined"><ManageSearchIcon/></Button>
-    </ButtonGroup>
-  </Stack>
-);
-
-function QueryHistoryTab({questionHistory, displayQuestion}) {
-return (
-  <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
-    <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-    {questionHistory.map(qr => qr.generateAnswerThumbnail(displayQuestion))}
-  </Stack>
-  </Stack>
-  );
-}
-
-// for now, question_info is just the question text!
-
-function getFakeAnswers(qtext) {
-    var answers=['answer #1', 'answer #2']
-    if (qtext === "How do I install PyTorch?") {
-        answers=['Open Anaconda manager and run the command as it specified in the installation instructions. Copy `conda install pytorch torchvision torchaudio cpuonly -c pytorch`.',
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-        'Venenatis tellus in metus vulputate eu scelerisque. Penatibus et magnis dis parturient montes. Scelerisque in dictum non consectetur a. Morbi leo urna molestie at elementum eu facilisis. Lectus sit amet est placerat in egestas. Purus sit amet luctus venenatis lectus magna fringilla urna porttitor. Nisl rhoncus mattis rhoncus urna neque viverra justo nec. Dignissim cras tincidunt lobortis feugiat vivamus. Elit duis tristique sollicitudin nibh sit. Id diam maecenas ultricies mi eget mauris pharetra et. At augue eget arcu dictum varius duis at consectetur. Est ante in nibh mauris cursus mattis molestie a. Nisl nunc mi ipsum faucibus. Aliquet enim tortor at auctor urna nunc. Vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Lacus vel facilisis volutpat est.']
-    } else if (qtext === "n/a") {
-        return ["n/a"]
-    }
-    return answers;
-}
-
-function createFakeQR(qtext) {
-    return new QueryAndResponse(qtext, getFakeAnswers(qtext));
-}
 
 class QueryAndResponse {
     constructor(qtext, answers) {
@@ -169,6 +89,107 @@ class QueryAndResponse {
         // for now just compare question equality
         return (this.qtext === other.qtext);
     }
+}
+
+
+class EasyAskQuestion  {
+
+    constructor(qtext, status) {
+        this.qtext = qtext;
+        this.status = status;
+        this.qr = createFakeQR(qtext);
+    }
+
+    createButton(displayQuestion) {
+        return(
+            <Button variant="outlined" color={this.status} key={this.qtext}
+            style={{color: this.status}}
+            onClick={() => displayQuestion(this.qr)}>{this.qtext}</Button>
+        );
+
+    }
+}
+
+const easyAskQuestions = [
+    new EasyAskQuestion("What's next?", "success"),
+    new EasyAskQuestion("Does this look right?", "success"),
+    new EasyAskQuestion("What's wrong?", "error"),
+    new EasyAskQuestion("How do I fix this?", "error"),
+    new EasyAskQuestion("What should this look like?", "error")
+]
+
+function ChangeStateButton ({color, key, text, onClick}) {
+return(
+    <Button variant="contained" color={color} key="changestate" style={{color: color}} onClick={onClick}>{text}</Button>
+    );
+}
+
+function EasyAskBox({errorState, stateChanger, displayQuestion}) {
+    if (errorState) {
+        const buttons = easyAskQuestions.filter(eaq => eaq.status === 'error');
+        return(
+          <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
+            {buttons.map(eaq => eaq.createButton(displayQuestion))}
+            <ChangeStateButton color='success' text={"I'm not having any problems."} onClick={() => stateChanger(0)} />
+          </Stack>
+          );
+    } else {
+        const buttons = easyAskQuestions.filter(eaq => eaq.status === 'success');
+        return (
+          <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
+            {buttons.map(eaq => eaq.createButton(displayQuestion))}
+            <ChangeStateButton color='error' text={"I'm having a problem."} onClick={() => stateChanger(1)}/>
+          </Stack>
+          );
+     }
+}
+
+const Question = (props) => (
+    <div style={{fontWeight: 'bold'}}>Q: {props.text}</div>
+);
+
+const Answer = (props) => (
+    <div style={{fontStyle: 'italic'}}>A: {props.text}</div>
+);
+
+// X button is not implemented :)
+const FullAnswer = (props) => (
+<Stack direction='row' spacing={1} justifyContent='space-between'>
+    <Answer text={props.text} />
+    <ButtonGroup orientation='vertical'>
+    <Button variant="outlined" color="error" onClick={props.removeHandler}><HighlightOffIcon/></Button>
+    <Button variant="outlined"><QuestionMarkIcon/></Button>
+    <Button variant="outlined"><ManageSearchIcon/></Button>
+    </ButtonGroup>
+  </Stack>
+);
+
+function QueryHistoryTab({questionHistory, displayQuestion}) {
+return (
+  <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
+    <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
+    {questionHistory.map(qr => qr.generateAnswerThumbnail(displayQuestion))}
+  </Stack>
+  </Stack>
+  );
+}
+
+// for now, question_info is just the question text!
+
+function getFakeAnswers(qtext) {
+    var answers=['answer #1', 'answer #2']
+    if (qtext === "How do I install PyTorch?") {
+        answers=['Open Anaconda manager and run the command as it specified in the installation instructions. Copy `conda install pytorch torchvision torchaudio cpuonly -c pytorch`.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        'Venenatis tellus in metus vulputate eu scelerisque. Penatibus et magnis dis parturient montes. Scelerisque in dictum non consectetur a. Morbi leo urna molestie at elementum eu facilisis. Lectus sit amet est placerat in egestas. Purus sit amet luctus venenatis lectus magna fringilla urna porttitor. Nisl rhoncus mattis rhoncus urna neque viverra justo nec. Dignissim cras tincidunt lobortis feugiat vivamus. Elit duis tristique sollicitudin nibh sit. Id diam maecenas ultricies mi eget mauris pharetra et. At augue eget arcu dictum varius duis at consectetur. Est ante in nibh mauris cursus mattis molestie a. Nisl nunc mi ipsum faucibus. Aliquet enim tortor at auctor urna nunc. Vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Lacus vel facilisis volutpat est.']
+    } else if (qtext === "n/a") {
+        return ["n/a"]
+    }
+    return answers;
+}
+
+function createFakeQR(qtext) {
+    return new QueryAndResponse(qtext, getFakeAnswers(qtext));
 }
 
 
