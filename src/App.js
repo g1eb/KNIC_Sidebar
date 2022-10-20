@@ -139,6 +139,11 @@ class QueryAndResponse {
     getFirstAnswer() {
         return this.answers[0];
     }
+
+    matches(other) {
+        // for now just compare question equality
+        return (this.qtext === other.qtext);
+    }
 }
 
 function QATab({question_info}) {
@@ -211,7 +216,13 @@ function TabMaster() {
     setTabValue(1); // 1 is just the hard-coded value of the Q & A pane
     var qr = new QueryAndResponse(qtext);
     setQIValue(qr);
-    if (!questionHistory.includes(qr)) {
+    var seenAlready = false;
+    questionHistory.forEach(function (item, index) {
+        if (qr.matches(item)) {
+            seenAlready = true;
+        }
+    });
+    if (!seenAlready) {
         questionHistory.unshift(qr);
     }
     setQHValue(questionHistory);
