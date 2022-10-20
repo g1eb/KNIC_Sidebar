@@ -30,7 +30,13 @@ const PageContents = () => (
 
 function EasyAskButton ({color, key, text, displayQuestion}) {
 return(
-    <Button variant="outlined" color={color} key={key} style={{color: color}} onClick={displayQuestion}>{text}</Button>
+    <Button variant="outlined" color={color} key={key} style={{color: color}} onClick={() => displayQuestion(text)}>{text}</Button>
+    );
+}
+
+function ChangeStateButton ({color, key, text, onClick}) {
+return(
+    <Button variant="outlined" color={color} key="changestate" style={{color: color}} onClick={onClick}>{text}</Button>
     );
 }
 
@@ -41,7 +47,7 @@ return(
     <EasyAskButton color='error' key="whatswrong" text={"What's wrong?"} displayQuestion={displayQuestion}/>
     <EasyAskButton color='error' key="fix" text={"How do I fix this?"} displayQuestion={displayQuestion}/>
     <EasyAskButton color='error' key="looklike" text={"What should this look like?"} displayQuestion={displayQuestion}/>
-    <EasyAskButton color='success' key="problem" text={"I'm not having any problems."} onClick={() => stateChanger(0)} />
+    <ChangeStateButton color='success' text={"I'm not having any problems."} onClick={() => stateChanger(0)} />
   </Stack>
   );
 } else {
@@ -49,7 +55,7 @@ return (
   <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
     <EasyAskButton color='success' key="whatsnext" text={"What's next?"} displayQuestion={displayQuestion}/>
     <EasyAskButton color='success' key="lookright" text={"Does this look right?"} displayQuestion={displayQuestion}/>
-    <EasyAskButton color='error' key="problem" text={"I'm having a problem."} onClick={() => stateChanger(1)}/>
+    <ChangeStateButton color='error' text={"I'm having a problem."} onClick={() => stateChanger(1)}/>
   </Stack>
   );
   }
@@ -63,8 +69,6 @@ const Answer = (props) => (
     <div style={{fontStyle: 'italic'}}>A: {props.text}</div>
 );
 
-// TODO: Modify displayQuestion to actually take info about the question and display it!
-
 function QAPair({qtext, atext, displayQuestion}) {
 
     var shortText = atext
@@ -73,12 +77,12 @@ function QAPair({qtext, atext, displayQuestion}) {
     }
 
     return (
-      <Stack direction='row' justifyContent='space-between'>
+      <Stack direction='row' spacing={1} justifyContent='space-between'>
       <Stack spacing={1}>
         <Question text={qtext}/>
         <Answer text={shortText}/>
       </Stack>
-      <Button variant="outlined" onClick={() => displayQuestion(1)}><ZoomInIcon /></Button>
+      <Button variant="outlined" onClick={() => displayQuestion(qtext)}><ZoomInIcon /></Button>
       </Stack>
     );
 }
@@ -86,18 +90,12 @@ function QAPair({qtext, atext, displayQuestion}) {
 function SituationSpecificQA({displayQuestion}) {
 
 return(
-<Accordion>
-  <AccordionSummary expandIcon={<ExpandMoreIcon />} expanded='true'>
-     {"Situation-specific Q&A"}
-  </AccordionSummary>
-  <AccordionDetails>
   <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
+    <div style={{marginBottom: "10px", textAlign: "center"}}>Situation-specific Q&A</div>
     <QAPair qtext="How do I install PyTorch?" atext="Sample answer that is much longer than the other one so that we can test the cut off at 100 characters."
     displayQuestion={displayQuestion}/>
     <QAPair qtext="How do I check if PyTorch is installed?" atext="Sample answer" displayQuestion={displayQuestion}/>
   </Stack>
-  </AccordionDetails>
-</Accordion>
 );
 }
 
@@ -121,13 +119,27 @@ const QAList = (props) => (
   </Stack>
 );
 
-const QATab = () => (
+function QATab({question_info}) {
+
+// for now, question_info is just the question text!
+
+var answers=['answer #1', 'answer #2']
+if (question_info === "How do I install PyTorch?") {
+    answers=['hardcoded answer #1', 'hardcoded answer #2', 'hardcoded answer #3']
+}
+
+
+return (
     <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
     <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-        <QAList qtext="Sample query text" answers={['answer #1', 'answer #2']}/>
+        <QAList qtext={question_info} answers={answers}/>
   </Stack>
   </Stack>
-);
+  );
+}
+
+// TODO Make this live and send it to the Q&A pane
+// TODO Needs a submit button (better to listen for the enter key but I don't know how to do that)
 
 const CustomSearchField = () => (
     <TextField
@@ -158,9 +170,9 @@ const CurrentState = () => (
   </AccordionSummary>
   <AccordionDetails>
     <Stack bgcolor="white" spacing={1} style={{padding: "10px", borderRadius: '16px'}}>
-        <CurrentStateItem color='primary' key='dunno' text='node'/>
-        <CurrentStateItem color='primary' key='dunno' text='node'/>
-        <CurrentStateItem color='primary' key='dunno' text='node'/>
+        <CurrentStateItem color='primary' key='dunno1' text='node'/>
+        <CurrentStateItem color='primary' key='dunno2' text='node'/>
+        <CurrentStateItem color='primary' key='dunno3' text='node'/>
     </Stack>
   </AccordionDetails>
   </Accordion>
@@ -168,14 +180,16 @@ const CurrentState = () => (
 
 function TabMaster() {
   const [tabValue, setTabValue] = React.useState(0);
+  const [questionInfo, setQIValue] = React.useState('default question text');
 
   function handleTabChange(event, newValue) {
     setTabValue(newValue);
   }
 
-  function displayQuestion(event, question_info) {
-    setTabValue(1);
-    // TODO actually display some question info
+  function displayQuestion(question_info) {
+    setTabValue(1); // 1 is just the hard-coded value of the Q & A pane
+    setQIValue(question_info);
+    // TODO actually display some question info!
   }
 
   return (
@@ -194,8 +208,8 @@ function TabMaster() {
       <div role="tabpanel" hidden={tabValue !== 0} id={`simple-tabpanel-0`}>
         <MainDisplayPane displayQuestion={displayQuestion}/>
       </div>
-      <div role="tabpanel" disabled hidden={tabValue !== 1} id={`simple-tabpanel-1`}>
-        <QATab />
+      <div role="tabpanel" hidden={tabValue !== 1} id={`simple-tabpanel-1`}>
+        <QATab question_info={questionInfo}/>
       </div>
       <div role="tabpanel" hidden={tabValue !== 2} id={`simple-tabpanel-2`}>
         <QueryHistoryTab displayQuestion={displayQuestion}/>
