@@ -138,15 +138,20 @@ return (
   );
 }
 
-// TODO Make this live and send it to the Q&A pane
-// TODO Needs a submit button (better to listen for the enter key but I don't know how to do that)
+function CustomSearchField({displayQuestion}) {
 
-const CustomSearchField = () => (
+return(
     <TextField
         type="search"
         variant="outlined"
         margin="normal"
         style={{backgroundColor: 'white'}}
+        onKeyPress={(ev) => {
+        console.log(`Pressed keyCode ${ev.key}`);
+          if (ev.key === 'Enter') {
+            displayQuestion(ev.target.value);
+          }
+        }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -155,7 +160,8 @@ const CustomSearchField = () => (
           )
         }}
     />
-);
+    );
+}
 
 // TODO Replace CurrentStateItem with something better!
 
@@ -231,7 +237,7 @@ function MainDisplayPane({displayQuestion}) {
         <CurrentState />
         <EasyAskBox errorState={errorState} stateChanger={wrapperSetErrorState} displayQuestion={displayQuestion}/>
         <SituationSpecificQA displayQuestion={displayQuestion}/>
-        <CustomSearchField />
+        <CustomSearchField  displayQuestion={displayQuestion}/>
      </Stack>
     );
 }
