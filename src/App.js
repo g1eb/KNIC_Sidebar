@@ -1,5 +1,6 @@
 import './App.css';
 import React from "react";
+import { useCallback } from "react";
 import Stack from '@mui/material/Stack';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -13,6 +14,7 @@ import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 // import ErrorIcon from '@mui/icons-material/Error';
 //import CancelIcon from '@mui/icons-material/Cancel';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import '@fontsource/roboto/300.css';
@@ -26,70 +28,89 @@ const PageContents = () => (
   </div>
 );
 
-// TODO: When the user clicks the "I'm having a problem" button, switch to dispaly EasyAskBoxRed
-// TODO: When the user clicks the "I'm not having any problems" button, switch to display EasyAskBoxGreen
-// TODO: When the user clicks any other button, switch to the Q&A pane and display a response based on the query text
+function EasyAskButton ({color, key, text, displayQuestion}) {
+return(
+    <Button variant="outlined" color={color} key={key} style={{color: color}} onClick={displayQuestion}>{text}</Button>
+    );
+}
 
-const EasyAskButton = (props) => (
-    <Button variant="outlined" color={props.color} key={props.key} style={{color: props.color}} >{props.text}</Button>
-);
-
-const EasyAskBoxGreen = () => (
+function EasyAskBox({errorState, stateChanger, displayQuestion}) {
+if (errorState) {
+return(
   <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
-    <EasyAskButton color='success' key="whatsnext" text={"What's next?"} />
-    <EasyAskButton color='success' key="lookright" text={"Does this look right?"} />
-    <EasyAskButton color='error' key="problem" text={"I'm having a problem."} />
+    <EasyAskButton color='error' key="whatswrong" text={"What's wrong?"} displayQuestion={displayQuestion}/>
+    <EasyAskButton color='error' key="fix" text={"How do I fix this?"} displayQuestion={displayQuestion}/>
+    <EasyAskButton color='error' key="looklike" text={"What should this look like?"} displayQuestion={displayQuestion}/>
+    <EasyAskButton color='success' key="problem" text={"I'm not having any problems."} onClick={() => stateChanger(0)} />
   </Stack>
-);
-
-const EasyAskBoxRed = () => (
+  );
+} else {
+return (
   <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
-    <EasyAskButton color='error' key="whatswrong" text={"What's wrong?"} />
-    <EasyAskButton color='error' key="fix" text={"How do I fix this?"} />
-    <EasyAskButton color='error' key="looklike" text={"What should this look like?"} />
-    <EasyAskButton color='success' key="problem" text={"I'm not having any problems."} />
+    <EasyAskButton color='success' key="whatsnext" text={"What's next?"} displayQuestion={displayQuestion}/>
+    <EasyAskButton color='success' key="lookright" text={"Does this look right?"} displayQuestion={displayQuestion}/>
+    <EasyAskButton color='error' key="problem" text={"I'm having a problem."} onClick={() => stateChanger(1)}/>
   </Stack>
-);
+  );
+  }
+}
 
 const Question = (props) => (
     <div style={{fontWeight: 'bold'}}>Q: {props.text}</div>
 );
 
-// TODO: Have some sample longer answers, and allow for expansion of individual answers
-
 const Answer = (props) => (
     <div style={{fontStyle: 'italic'}}>A: {props.text}</div>
 );
 
-const QAPair = (props) => (
-  <Stack spacing={1}>
-    <Question text={props.qtext}/>
-    <Answer text={props.atext}/>
-  </Stack>
-);
+// TODO: Modify displayQuestion to actually take info about the question and display it!
 
-const SituationSpecificQA = () => (
+function QAPair({qtext, atext, displayQuestion}) {
+
+    var shortText = atext
+    if (atext.length >= 100) {
+        shortText = atext.substring(0, 100) + "..."
+    }
+
+    return (
+      <Stack direction='row' justifyContent='space-between'>
+      <Stack spacing={1}>
+        <Question text={qtext}/>
+        <Answer text={shortText}/>
+      </Stack>
+      <Button variant="outlined" onClick={() => displayQuestion(1)}><ZoomInIcon /></Button>
+      </Stack>
+    );
+}
+
+function SituationSpecificQA({displayQuestion}) {
+
+return(
 <Accordion>
   <AccordionSummary expandIcon={<ExpandMoreIcon />} expanded='true'>
      {"Situation-specific Q&A"}
   </AccordionSummary>
   <AccordionDetails>
   <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-    <QAPair qtext="How do I install PyTorch?" atext="Sample answer"/>
-    <QAPair qtext="How do I check if PyTorch is installed?" atext="Sample answer"/>
+    <QAPair qtext="How do I install PyTorch?" atext="Sample answer that is much longer than the other one so that we can test the cut off at 100 characters."
+    displayQuestion={displayQuestion}/>
+    <QAPair qtext="How do I check if PyTorch is installed?" atext="Sample answer" displayQuestion={displayQuestion}/>
   </Stack>
   </AccordionDetails>
 </Accordion>
 );
+}
 
-const QueryHistoryTab = () => (
-<Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
+function QueryHistoryTab({displayQuestion}) {
+return (
+  <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
     <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-    <QAPair qtext="I asked this query before" atext="Sample answer"/>
-    <QAPair qtext="I also asked this one" atext="Sample answer"/>
+    <QAPair qtext="I asked this query before" atext="Sample answer" displayQuestion={displayQuestion}/>
+    <QAPair qtext="I also asked this one" atext="Sample answer" displayQuestion={displayQuestion}/>
   </Stack>
   </Stack>
-);
+  );
+}
 
 const QAList = (props) => (
   <Stack spacing={1}>
@@ -146,18 +167,23 @@ const CurrentState = () => (
 );
 
 function TabMaster() {
-  const [value, setValue] = React.useState(0);
+  const [tabValue, setTabValue] = React.useState(0);
 
-  function handleChange(event, newValue) {
-    setValue(newValue);
+  function handleTabChange(event, newValue) {
+    setTabValue(newValue);
+  }
+
+  function displayQuestion(event, question_info) {
+    setTabValue(1);
+    // TODO actually display some question info
   }
 
   return (
   <div>
       <Box centered sx={{alignItems: 'center', width: 400}}>
         <Tabs
-          value={value}
-          onChange={handleChange}
+          value={tabValue}
+          onChange={handleTabChange}
           centered
         >
           <Tab label="Main" id="simple-tabpanel-0" />
@@ -165,29 +191,36 @@ function TabMaster() {
           <Tab label="Query History" id="simple-tabpanel-2" />
         </Tabs>
       </Box>
-      <div role="tabpanel" hidden={value !== 0} id={`simple-tabpanel-0`}>
-        <Sidebar />
+      <div role="tabpanel" hidden={tabValue !== 0} id={`simple-tabpanel-0`}>
+        <MainDisplayPane displayQuestion={displayQuestion}/>
       </div>
-      <div role="tabpanel" disabled hidden={value !== 1} id={`simple-tabpanel-1`}>
+      <div role="tabpanel" disabled hidden={tabValue !== 1} id={`simple-tabpanel-1`}>
         <QATab />
       </div>
-      <div role="tabpanel" hidden={value !== 2} id={`simple-tabpanel-2`}>
-        <QueryHistoryTab />
+      <div role="tabpanel" hidden={tabValue !== 2} id={`simple-tabpanel-2`}>
+        <QueryHistoryTab displayQuestion={displayQuestion}/>
       </div>
       </div>
   );
 }
 
-const Sidebar = () => (
+function MainDisplayPane({displayQuestion}) {
+    const [errorState, setErrorState] = React.useState(0);
 
-  <Stack bgcolor="lightgray" spacing={2} className="Sidebar" style={{padding: "10px", margin: "10px", width: 400}}>
+    // make wrapper function to give child
+    const wrapperSetErrorState = useCallback(val => {
+        setErrorState(val);
+    }, [setErrorState]);
+
+    return (
+     <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
         <CurrentState />
-        <EasyAskBoxGreen />
-        <EasyAskBoxRed />
-        <SituationSpecificQA />
+        <EasyAskBox errorState={errorState} stateChanger={wrapperSetErrorState} displayQuestion={displayQuestion}/>
+        <SituationSpecificQA displayQuestion={displayQuestion}/>
         <CustomSearchField />
-  </Stack>
-);
+     </Stack>
+    );
+}
 
 export default function App() {
 
