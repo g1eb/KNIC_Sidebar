@@ -99,12 +99,12 @@ return(
 );
 }
 
-function QueryHistoryTab({displayQuestion}) {
+function QueryHistoryTab({questionHistory, displayQuestion}) {
+
 return (
   <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
     <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-    <QAPair qtext="I asked this query before" atext="Sample answer" displayQuestion={displayQuestion}/>
-    <QAPair qtext="I also asked this one" atext="Sample answer" displayQuestion={displayQuestion}/>
+    {questionHistory.map(qr => <QAPair qtext={qr.qtext} atext={qr.getFirstAnswer()} displayQuestion={displayQuestion}/>)}
   </Stack>
   </Stack>
   );
@@ -203,6 +203,7 @@ const CurrentState = () => (
 function TabMaster() {
   const [tabValue, setTabValue] = React.useState(0);
   const [questionInfo, setQIValue] = React.useState(new QueryAndResponse('n/a'));
+  const [questionHistory, setQHValue] = React.useState([]);
 
   function handleTabChange(event, newValue) {
     setTabValue(newValue);
@@ -210,8 +211,12 @@ function TabMaster() {
 
   function displayQuestion(qtext) {
     setTabValue(1); // 1 is just the hard-coded value of the Q & A pane
-    setQIValue(new QueryAndResponse(qtext));
-    // TODO actually display some question info!
+    var qr = new QueryAndResponse(qtext);
+    setQIValue(qr);
+    if (!questionHistory.includes(qr)) {
+        questionHistory.unshift(qr);
+    }
+    setQHValue(questionHistory);
   }
 
   return (
@@ -234,7 +239,7 @@ function TabMaster() {
         <QATab question_info={questionInfo}/>
       </div>
       <div role="tabpanel" hidden={tabValue !== 2} id={`simple-tabpanel-2`}>
-        <QueryHistoryTab displayQuestion={displayQuestion}/>
+        <QueryHistoryTab questionHistory={questionHistory} displayQuestion={displayQuestion}/>
       </div>
       </div>
   );
