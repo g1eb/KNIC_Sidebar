@@ -34,7 +34,7 @@ return(
 
 function ChangeStateButton ({color, key, text, onClick}) {
 return(
-    <Button variant="outlined" color={color} key="changestate" style={{color: color}} onClick={onClick}>{text}</Button>
+    <Button variant="contained" color={color} key="changestate" style={{color: color}} onClick={onClick}>{text}</Button>
     );
 }
 
