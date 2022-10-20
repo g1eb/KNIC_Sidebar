@@ -18,13 +18,17 @@ import Tab from '@mui/material/Tab';
 import '@fontsource/roboto/300.css';
 
 const PageContents = () => (
-  <div style={{color: "blueGrey", padding: "10px"}}>
+  <div style={{color: "grey", padding: "10px"}}>
     <p>
       RTG boilerplate goes here
     </p>
 
   </div>
 );
+
+// TODO: When the user clicks the "I'm having a problem" button, switch to dispaly EasyAskBoxRed
+// TODO: When the user clicks the "I'm not having any problems" button, switch to display EasyAskBoxGreen
+// TODO: When the user clicks any other button, switch to the Q&A pane and display a response based on the query text
 
 const EasyAskButton = (props) => (
     <Button variant="outlined" color={props.color} key={props.key} style={{color: props.color}} >{props.text}</Button>
@@ -50,6 +54,8 @@ const EasyAskBoxRed = () => (
 const Question = (props) => (
     <div style={{fontWeight: 'bold'}}>Q: {props.text}</div>
 );
+
+// TODO: Have some sample longer answers, and allow for expansion of individual answers
 
 const Answer = (props) => (
     <div style={{fontStyle: 'italic'}}>A: {props.text}</div>
@@ -118,9 +124,10 @@ const CustomSearchField = () => (
     />
 );
 
+// TODO Replace CurrentStateItem with something better!
+
 const CurrentStateItem = (props) => (
     <Button variant="outlined" color={props.color} key={props.key} style={{color: props.color}} >{props.text}</Button>
-
 );
 
 const CurrentState = () => (
