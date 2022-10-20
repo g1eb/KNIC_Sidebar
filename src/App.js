@@ -119,23 +119,39 @@ const QAList = (props) => (
   </Stack>
 );
 
-function QATab({question_info}) {
-
 // for now, question_info is just the question text!
 
-var answers=['answer #1', 'answer #2']
-if (question_info === "How do I install PyTorch?") {
-    answers=['hardcoded answer #1', 'hardcoded answer #2', 'hardcoded answer #3']
+function getFakeAnswers(qtext) {
+    var answers=['answer #1', 'answer #2']
+    if (qtext === "How do I install PyTorch?") {
+        answers=['hardcoded answer #1', 'hardcoded answer #2', 'hardcoded answer #3']
+    } else if (qtext === "n/a") {
+        return ["n/a"]
+    }
+    return answers;
 }
 
 
-return (
-    <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
-    <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-        <QAList qtext={question_info} answers={answers}/>
-  </Stack>
-  </Stack>
-  );
+class QueryAndResponse {
+    constructor(qtext) {
+        this.qtext = qtext;
+        this.answers = getFakeAnswers(qtext);
+    }
+
+    getFirstAnswer() {
+        return this.answers[0];
+    }
+}
+
+function QATab({question_info}) {
+
+    return (
+        <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
+        <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
+            <QAList qtext={question_info.qtext} answers={question_info.answers}/>
+      </Stack>
+      </Stack>
+      );
 }
 
 function CustomSearchField({displayQuestion}) {
@@ -186,15 +202,15 @@ const CurrentState = () => (
 
 function TabMaster() {
   const [tabValue, setTabValue] = React.useState(0);
-  const [questionInfo, setQIValue] = React.useState('default question text');
+  const [questionInfo, setQIValue] = React.useState(new QueryAndResponse('n/a'));
 
   function handleTabChange(event, newValue) {
     setTabValue(newValue);
   }
 
-  function displayQuestion(question_info) {
+  function displayQuestion(qtext) {
     setTabValue(1); // 1 is just the hard-coded value of the Q & A pane
-    setQIValue(question_info);
+    setQIValue(new QueryAndResponse(qtext));
     // TODO actually display some question info!
   }
 
