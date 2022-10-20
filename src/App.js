@@ -32,7 +32,7 @@ const PageContents = () => (
 
 function EasyAskButton ({color, key, text, displayQuestion}) {
 return(
-    <Button variant="outlined" color={color} key={key} style={{color: color}} onClick={() => displayQuestion(text)}>{text}</Button>
+    <Button variant="outlined" color={color} key={key} style={{color: color}} onClick={() => displayQuestion(createFakeQR(text))}>{text}</Button>
     );
 }
 
@@ -76,27 +76,12 @@ const FullAnswer = (props) => (
 <Stack direction='row' spacing={1} justifyContent='space-between'>
     <Answer text={props.text} />
     <ButtonGroup orientation='vertical'>
-    <Button variant="outlined" color="error"><HighlightOffIcon/></Button>
+    <Button variant="outlined" color="error" onClick={props.removeHandler}><HighlightOffIcon/></Button>
     <Button variant="outlined"><QuestionMarkIcon/></Button>
     <Button variant="outlined"><ManageSearchIcon/></Button>
     </ButtonGroup>
   </Stack>
 );
-
-function SituationSpecificQA({displayQuestion}) {
-
-    var qr1 = new QueryAndResponse("How do I install PyTorch?")
-    var qr2 = new QueryAndResponse("How do I check if PyTorch is installed?")
-
-    // considered maxHeight: 400, overflow:'auto'
-    return(
-      <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-        <div style={{marginBottom: "10px", textAlign: "center"}}>Situation-specific Q&A</div>
-        {qr1.generateAnswerThumbnail(displayQuestion)}
-        {qr2.generateAnswerThumbnail(displayQuestion)}
-      </Stack>
-    );
-}
 
 function QueryHistoryTab({questionHistory, displayQuestion}) {
 return (
@@ -122,22 +107,35 @@ function getFakeAnswers(qtext) {
     return answers;
 }
 
+function createFakeQR(qtext) {
+    return new QueryAndResponse(qtext, getFakeAnswers(qtext));
+}
 
 class QueryAndResponse {
-    constructor(qtext) {
+    constructor(qtext, answers) {
         this.qtext = qtext;
-        this.answers = getFakeAnswers(qtext);
+        this.answers = answers;
+    }
+
+    removeAnswer(index, handleAnswerRemoval) {
+        console.log("I want to remove index #" + index)
+        this.answers.splice(index, 1);
+        console.log(this.answers.length);
+        handleAnswerRemoval();
     }
 
     getFirstAnswer() {
-        return this.answers[0];
+        if (this.answers) {
+            return this.answers[0];
+        } else {
+            return "";
+        }
     }
-
 
     generateAnswerThumbnail(displayQuestion) {
 
         var shortText = this.getFirstAnswer()
-        if (shortText.length >= 100) {
+        if (shortText && shortText.length >= 100) {
             shortText = shortText.substring(0, 100) + "..."
         }
 
@@ -149,18 +147,19 @@ class QueryAndResponse {
             <Answer text={shortText}/>
           </Stack>
           <ButtonGroup orientation='vertical'>
-          <Button variant="outlined" onClick={() => displayQuestion(this.qtext)}><ZoomInIcon /></Button>
+          <Button variant="outlined" onClick={() => displayQuestion(this)}><ZoomInIcon /></Button>
           </ButtonGroup>
           </Stack>
         );
     }
 
-    generateAnswerList() {
+    generateAnswerList(handleAnswerRemoval) {
+        console.log("generating the answer list, with answer length " + this.answers.length);
         return (
           <Stack spacing={1}>
             <Question text={this.qtext}/>
-            {this.answers.map(answer => {
-                return <FullAnswer text={answer} />;
+            {this.answers.map((answer, index) => {
+                return <FullAnswer text={answer} removeHandler={() => this.removeAnswer(index, handleAnswerRemoval)}/>;
               })}
           </Stack>
         );
@@ -172,12 +171,35 @@ class QueryAndResponse {
     }
 }
 
-function QATab({question_info}) {
+
+
+var q1 = "How do I install PyTorch?";
+var q2 = "How do I know if PyTorch is installed?";
+var qr1 = new QueryAndResponse(q1, getFakeAnswers(q1));
+var qr2 = new QueryAndResponse(q2, getFakeAnswers(q2));
+function SituationSpecificQA({displayQuestion}) {
+
+
+    // considered maxHeight: 400, overflow:'auto'
+    return(
+      <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
+        <div style={{marginBottom: "10px", textAlign: "center"}}>Situation-specific Q&A</div>
+        {qr1.generateAnswerThumbnail(displayQuestion)}
+        {qr2.generateAnswerThumbnail(displayQuestion)}
+      </Stack>
+    );
+}
+
+function QATab({question_info, stateChangeHandler}) {
+
+    function handleAnswerRemoval() {
+        stateChangeHandler();
+    }
 
     return (
         <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
         <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-        {question_info.generateAnswerList()}
+        {question_info.generateAnswerList(handleAnswerRemoval)}
 
       </Stack>
       </Stack>
@@ -195,7 +217,7 @@ return(
         onKeyPress={(ev) => {
         console.log(`Pressed keyCode ${ev.key}`);
           if (ev.key === 'Enter') {
-            displayQuestion(ev.target.value);
+            displayQuestion(createFakeQR(ev.target.value));
           }
         }}
         InputProps={{
@@ -232,16 +254,21 @@ const CurrentState = () => (
 
 function TabMaster() {
   const [tabValue, setTabValue] = React.useState(0);
-  const [questionInfo, setQIValue] = React.useState(new QueryAndResponse('n/a'));
+  const [questionInfo, setQIValue] = React.useState(new QueryAndResponse('n/a', getFakeAnswers('n/a')));
+  const [questionState, setQuestionState] = React.useState(0);
   const [questionHistory, setQHValue] = React.useState([]);
+
 
   function handleTabChange(event, newValue) {
     setTabValue(newValue);
   }
 
-  function displayQuestion(qtext) {
+  function handleQuestionStateChange() {
+    setQuestionState(questionState + 1);
+  }
+
+  function displayQuestion(qr) {
     setTabValue(1); // 1 is just the hard-coded value of the Q & A pane
-    var qr = new QueryAndResponse(qtext);
     setQIValue(qr);
     var seenAlready = false;
     questionHistory.forEach(function (item, index) {
@@ -272,7 +299,7 @@ function TabMaster() {
         <MainDisplayPane displayQuestion={displayQuestion}/>
       </div>
       <div role="tabpanel" hidden={tabValue !== 1} id={`simple-tabpanel-1`}>
-        <QATab question_info={questionInfo}/>
+        <QATab question_info={questionInfo} stateChangeHandler={handleQuestionStateChange}/>
       </div>
       <div role="tabpanel" hidden={tabValue !== 2} id={`simple-tabpanel-2`}>
         <QueryHistoryTab questionHistory={questionHistory} displayQuestion={displayQuestion}/>
