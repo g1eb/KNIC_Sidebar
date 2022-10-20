@@ -83,59 +83,30 @@ const FullAnswer = (props) => (
   </Stack>
 );
 
-function QAPair({qtext, atext, displayQuestion}) {
+function SituationSpecificQA({displayQuestion}) {
 
-    var shortText = atext
-    if (atext.length >= 100) {
-        shortText = atext.substring(0, 100) + "..."
-    }
+    var qr1 = new QueryAndResponse("How do I install PyTorch?")
+    var qr2 = new QueryAndResponse("How do I check if PyTorch is installed?")
 
-    // ButtonGroup makes the single button not get mega tall
-    return (
-      <Stack direction='row' spacing={1} justifyContent='space-between'>
-      <Stack spacing={1}>
-        <Question text={qtext}/>
-        <Answer text={shortText}/>
-      </Stack>
-      <ButtonGroup orientation='vertical'>
-      <Button variant="outlined" onClick={() => displayQuestion(qtext)}><ZoomInIcon /></Button>
-      </ButtonGroup>
+    // considered maxHeight: 400, overflow:'auto'
+    return(
+      <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
+        <div style={{marginBottom: "10px", textAlign: "center"}}>Situation-specific Q&A</div>
+        {qr1.generateAnswerThumbnail(displayQuestion)}
+        {qr2.generateAnswerThumbnail(displayQuestion)}
       </Stack>
     );
 }
 
-function SituationSpecificQA({displayQuestion}) {
-
-// considered maxHeight: 400, overflow:'auto'
-return(
-  <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-    <div style={{marginBottom: "10px", textAlign: "center"}}>Situation-specific Q&A</div>
-    <QAPair qtext="How do I install PyTorch?" atext="Sample answer that is much longer than the other one so that we can test the cut off at 100 characters."
-    displayQuestion={displayQuestion}/>
-    <QAPair qtext="How do I check if PyTorch is installed?" atext="Sample answer" displayQuestion={displayQuestion}/>
-  </Stack>
-);
-}
-
 function QueryHistoryTab({questionHistory, displayQuestion}) {
-
 return (
   <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
     <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-    {questionHistory.map(qr => <QAPair qtext={qr.qtext} atext={qr.getFirstAnswer()} displayQuestion={displayQuestion}/>)}
+    {questionHistory.map(qr => qr.generateAnswerThumbnail(displayQuestion))}
   </Stack>
   </Stack>
   );
 }
-
-const QAList = (props) => (
-  <Stack spacing={1}>
-    <Question text={props.qtext}/>
-    {props.answers.map(answer => {
-        return <FullAnswer text={answer} />;
-      })}
-  </Stack>
-);
 
 // for now, question_info is just the question text!
 
@@ -162,6 +133,39 @@ class QueryAndResponse {
         return this.answers[0];
     }
 
+
+    generateAnswerThumbnail(displayQuestion) {
+
+        var shortText = this.getFirstAnswer()
+        if (shortText.length >= 100) {
+            shortText = shortText.substring(0, 100) + "..."
+        }
+
+        // ButtonGroup makes the single button not get mega tall
+        return (
+          <Stack direction='row' spacing={1} justifyContent='space-between'>
+          <Stack spacing={1}>
+            <Question text={this.qtext}/>
+            <Answer text={shortText}/>
+          </Stack>
+          <ButtonGroup orientation='vertical'>
+          <Button variant="outlined" onClick={() => displayQuestion(this.qtext)}><ZoomInIcon /></Button>
+          </ButtonGroup>
+          </Stack>
+        );
+    }
+
+    generateAnswerList() {
+        return (
+          <Stack spacing={1}>
+            <Question text={this.qtext}/>
+            {this.answers.map(answer => {
+                return <FullAnswer text={answer} />;
+              })}
+          </Stack>
+        );
+    }
+
     matches(other) {
         // for now just compare question equality
         return (this.qtext === other.qtext);
@@ -173,7 +177,8 @@ function QATab({question_info}) {
     return (
         <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
         <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-            <QAList qtext={question_info.qtext} answers={question_info.answers}/>
+        {question_info.generateAnswerList()}
+
       </Stack>
       </Stack>
       );
