@@ -18,13 +18,11 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import '@fontsource/roboto/300.css';
+import TokenizeScreenshot from './images/rtg-tokenize.png'
 
 const PageContents = () => (
-  <div style={{color: "grey", padding: "10px"}}>
-    <p>
-      RTG boilerplate goes here
-    </p>
-
+  <div style={{padding: "10px"}}>
+    <img src={TokenizeScreenshot} alt="RTG screenshot"/>
   </div>
 );
 
