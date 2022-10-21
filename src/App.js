@@ -23,19 +23,9 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import '@fontsource/roboto/300.css';
 import TokenizeScreenshot from './images/rtg-tokenize.png'
-
 import TableDemo from "./TableDemo";
-/*
-import { TreeView } from '@mui/lab';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { TreeItem } from '@mui/lab'; // npm install @mui/lab
-import MaterialTable from '@material-table/core';  // npm install @mui/styles and npm install @material-table/core
-*/ 
-
-
 
 const PageContents = () => (
-
   <div style={{padding: "10px"}}>
     <img src={TokenizeScreenshot} alt="RTG screenshot"/>
   </div>
@@ -164,7 +154,6 @@ const Answer = (props) => (
     <div style={{fontStyle: 'italic'}}>A: {props.text}</div>
 );
 
-
 // X button is not implemented :)
 const FullAnswer = (props) => (
 <Stack direction='row' spacing={1} justifyContent='space-between'>
@@ -174,34 +163,6 @@ const FullAnswer = (props) => (
     <Button variant="outlined"><QuestionMarkIcon/></Button>
     <Button variant="outlined"><ManageSearchIcon/></Button>
     </ButtonGroup>
-
-function QAPair({qtext, atext, displayQuestion}) {
-
-    var shortText = atext
-    if (atext.length >= 100) {
-        shortText = atext.substring(0, 100) + "..."
-    }
-
-    return (
-      <Stack direction='row' spacing={1} justifyContent='space-between'>
-      <Stack spacing={1}>
-        <Question text={qtext}/>
-        <Answer text={shortText}/>
-      </Stack>
-      <Button variant="outlined" onClick={() => displayQuestion(qtext)}><ZoomInIcon /></Button>
-      </Stack>
-    );
-}
-
-function SituationSpecificQA({displayQuestion}) {
-
-return(
-  <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-    <div style={{marginBottom: "10px", textAlign: "center"}}>Situation-specific Q&A</div>
-    <QAPair qtext="How do I install PyTorch?" atext= 'On Google CoLab, Pytorch should already be pre-installed. Alternatively, you can install it by running "import torch" in a new cell'
-    displayQuestion={displayQuestion}/>
-    <QAPair qtext="How do I check if PyTorch is installed?" atext="You can run '!pip show torch' in a new cell to check if it is installed and what version is installed." displayQuestion={displayQuestion}/>
-
   </Stack>
 );
 
@@ -295,8 +256,6 @@ return(
 
 // TODO Replace CurrentStateItem with something better!
 
-
-
 const CurrentStateItem = (props) => (
     <Button variant="outlined" color={props.color} key={props.key} style={{color: props.color}} >{props.text}</Button>
 );
@@ -311,42 +270,6 @@ const CurrentState = () => (
   </AccordionDetails>
   </Accordion>
 );
-
-
-/* 
-  <TreeView
-      aria-label="multi-select"
-      defaultCollapseIcon={<ExpandMoreIcon />}
-      defaultExpandIcon={<ChevronRightIcon />}
-      multiSelect
-      sx={{ height: 216, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
-    >
-      <TreeItem nodeId="1" label="Transformer">
-        <TreeItem nodeId="2" label="Python" />
-        <TreeItem nodeId="3" label="MT" />
-      </TreeItem>
-      <TreeItem nodeId="4" label="Data Preperation">
-      <TreeItem nodeId="5" label="Download Datasets"/>
-      <TreeItem nodeId="6" label="Next: Tokenize Datasets" />
-      <TreeItem nodeId="7" label="Step Before: Setup RTG and other libs" />
-      </TreeItem>
-      <TreeItem nodeId="8" label="Error">
-        <TreeItem nodeId="9" label="Missing Data">
-          </TreeItem>
-        </TreeItem>
-    </TreeView>
-  */ 
-
-
-
-/* 
-   <Stack bgcolor="white" spacing={1} style={{padding: "10px", borderRadius: '16px'}}>
-        <CurrentStateItem color='primary' key='dunno1' text='node'/>
-        <CurrentStateItem color='primary' key='dunno2' text='node'/>
-        <CurrentStateItem color='primary' key='dunno3' text='node'/>
-    </Stack>
-  */ 
-
 
 function TabMaster() {
   const [tabValue, setTabValue] = React.useState(0);
