@@ -2,19 +2,23 @@ import './App.css';
 import React from "react";
 import { useCallback } from "react";
 import Stack from '@mui/material/Stack';
+//import Grid from '@mui/material/Grid';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
-//import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
+import ButtonGroup from '@mui/material/ButtonGroup';
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
-// import ErrorIcon from '@mui/icons-material/Error';
+import ErrorIcon from '@mui/icons-material/Error';
 //import CancelIcon from '@mui/icons-material/Cancel';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import '@fontsource/roboto/300.css';
@@ -37,37 +41,119 @@ const PageContents = () => (
   </div>
 );
 
-function EasyAskButton ({color, key, text, displayQuestion}) {
-return(
-    <Button variant="outlined" color={color} key={key} style={{color: color}} onClick={() => displayQuestion(text)}>{text}</Button>
-    );
+
+class QueryAndResponse {
+    constructor(qtext, answers) {
+        this.qtext = qtext;
+        this.answers = answers;
+    }
+
+    removeAnswer(index, handleAnswerRemoval) {
+        console.log("I want to remove index #" + index)
+        this.answers.splice(index, 1);
+        console.log(this.answers.length);
+        handleAnswerRemoval();
+    }
+
+    getFirstAnswer() {
+        if (this.answers) {
+            return this.answers[0];
+        } else {
+            return "";
+        }
+    }
+
+    generateAnswerThumbnail(displayQuestion) {
+
+        var shortText = this.getFirstAnswer()
+        if (shortText && shortText.length >= 100) {
+            shortText = shortText.substring(0, 100) + "..."
+        }
+
+        // ButtonGroup makes the single button not get mega tall
+        return (
+          <Stack direction='row' spacing={1} justifyContent='space-between'>
+          <Stack spacing={1}>
+            <Question text={this.qtext}/>
+            <Answer text={shortText}/>
+          </Stack>
+          <ButtonGroup orientation='vertical'>
+          <Button variant="outlined" onClick={() => displayQuestion(this)}><ZoomInIcon /></Button>
+          </ButtonGroup>
+          </Stack>
+        );
+    }
+
+    generateAnswerList(handleAnswerRemoval) {
+        console.log("generating the answer list, with answer length " + this.answers.length);
+        return (
+          <Stack spacing={1}>
+            <Question text={this.qtext}/>
+            {this.answers.map((answer, index) => {
+                return <FullAnswer text={answer} removeHandler={() => this.removeAnswer(index, handleAnswerRemoval)}/>;
+              })}
+          </Stack>
+        );
+    }
+
+    matches(other) {
+        // for now just compare question equality
+        return (this.qtext === other.qtext);
+    }
 }
+
+
+class EasyAskQuestion  {
+
+    constructor(qtext, status) {
+        this.qtext = qtext;
+        this.status = status;
+        this.qr = createFakeQR(qtext);
+    }
+
+    createButton(displayQuestion) {
+        return(
+            <Button variant="outlined" color={this.status} key={this.qtext}
+            style={{color: this.status}}
+            onClick={() => displayQuestion(this.qr)}>{this.qtext}</Button>
+        );
+
+    }
+}
+
+const easyAskQuestions = [
+    new EasyAskQuestion("What's next?", "success"),
+    new EasyAskQuestion("Does this look right?", "success"),
+    new EasyAskQuestion("What's wrong?", "error"),
+    new EasyAskQuestion("How do I fix this?", "error"),
+    new EasyAskQuestion("What should this look like?", "error")
+]
 
 function ChangeStateButton ({color, key, text, onClick}) {
 return(
-    <Button variant="outlined" color={color} key="changestate" style={{color: color}} onClick={onClick}>{text}</Button>
+    <Button variant="contained" color={color} key="changestate" style={{color: color}} onClick={onClick}>{text}</Button>
     );
 }
 
 function EasyAskBox({errorState, stateChanger, displayQuestion}) {
-if (errorState) {
-return(
-  <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
-    <EasyAskButton color='error' key="whatswrong" text={"What's wrong?"} displayQuestion={displayQuestion}/>
-    <EasyAskButton color='error' key="fix" text={"How do I fix this?"} displayQuestion={displayQuestion}/>
-    <EasyAskButton color='error' key="looklike" text={"What should this look like?"} displayQuestion={displayQuestion}/>
-    <ChangeStateButton color='success' text={"I'm not having any problems."} onClick={() => stateChanger(0)} />
-  </Stack>
-  );
-} else {
-return (
-  <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
-    <EasyAskButton color='success' key="whatsnext" text={"What's next?"} displayQuestion={displayQuestion}/>
-    <EasyAskButton color='success' key="lookright" text={"Does this look right?"} displayQuestion={displayQuestion}/>
-    <ChangeStateButton color='error' text={"I'm having a problem."} onClick={() => stateChanger(1)}/>
-  </Stack>
-  );
-  }
+    if (errorState) {
+        const buttons = easyAskQuestions.filter(eaq => eaq.status === 'error');
+        return(
+          <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
+            <Stack alignItems="center"><ErrorIcon /></Stack>
+            {buttons.map(eaq => eaq.createButton(displayQuestion))}
+            <ChangeStateButton color='success' text={"I'm not having any problems."} onClick={() => stateChanger(0)} />
+          </Stack>
+          );
+    } else {
+        const buttons = easyAskQuestions.filter(eaq => eaq.status === 'success');
+        return (
+          <Stack bgcolor="white" spacing={1} sx={{padding: "10px", borderRadius: '16px'}}>
+            {buttons.map(eaq => eaq.createButton(displayQuestion))}
+            <ChangeStateButton color='error' text={"I'm having a problem."} onClick={() => stateChanger(1)}/>
+          </Stack>
+          );
+     }
 }
 
 const Question = (props) => (
@@ -77,6 +163,17 @@ const Question = (props) => (
 const Answer = (props) => (
     <div style={{fontStyle: 'italic'}}>A: {props.text}</div>
 );
+
+
+// X button is not implemented :)
+const FullAnswer = (props) => (
+<Stack direction='row' spacing={1} justifyContent='space-between'>
+    <Answer text={props.text} />
+    <ButtonGroup orientation='vertical'>
+    <Button variant="outlined" color="error" onClick={props.removeHandler}><HighlightOffIcon/></Button>
+    <Button variant="outlined"><QuestionMarkIcon/></Button>
+    <Button variant="outlined"><ManageSearchIcon/></Button>
+    </ButtonGroup>
 
 function QAPair({qtext, atext, displayQuestion}) {
 
@@ -104,60 +201,68 @@ return(
     <QAPair qtext="How do I install PyTorch?" atext= 'On Google CoLab, Pytorch should already be pre-installed. Alternatively, you can install it by running "import torch" in a new cell'
     displayQuestion={displayQuestion}/>
     <QAPair qtext="How do I check if PyTorch is installed?" atext="You can run '!pip show torch' in a new cell to check if it is installed and what version is installed." displayQuestion={displayQuestion}/>
+
   </Stack>
 );
-}
 
 function QueryHistoryTab({questionHistory, displayQuestion}) {
-
 return (
-  <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
+  <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
     <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-    {questionHistory.map(qr => <QAPair qtext={qr.qtext} atext={qr.getFirstAnswer()} displayQuestion={displayQuestion}/>)}
+    {questionHistory.map(qr => qr.generateAnswerThumbnail(displayQuestion))}
   </Stack>
   </Stack>
   );
 }
-
-const QAList = (props) => (
-  <Stack spacing={1}>
-    <Question text={props.qtext}/>
-    {props.answers.map(answer => {
-        return <Answer text={answer} />;
-      })}
-  </Stack>
-);
 
 // for now, question_info is just the question text!
 
 function getFakeAnswers(qtext) {
     var answers=['answer #1', 'answer #2']
     if (qtext === "How do I install PyTorch?") {
-        answers=['hardcoded answer #1', 'hardcoded answer #2', 'hardcoded answer #3']
+        answers=['Open Anaconda manager and run the command as it specified in the installation instructions. Copy `conda install pytorch torchvision torchaudio cpuonly -c pytorch`.',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+        'Venenatis tellus in metus vulputate eu scelerisque. Penatibus et magnis dis parturient montes. Scelerisque in dictum non consectetur a. Morbi leo urna molestie at elementum eu facilisis. Lectus sit amet est placerat in egestas. Purus sit amet luctus venenatis lectus magna fringilla urna porttitor. Nisl rhoncus mattis rhoncus urna neque viverra justo nec. Dignissim cras tincidunt lobortis feugiat vivamus. Elit duis tristique sollicitudin nibh sit. Id diam maecenas ultricies mi eget mauris pharetra et. At augue eget arcu dictum varius duis at consectetur. Est ante in nibh mauris cursus mattis molestie a. Nisl nunc mi ipsum faucibus. Aliquet enim tortor at auctor urna nunc. Vitae proin sagittis nisl rhoncus mattis rhoncus urna neque. Lacus vel facilisis volutpat est.']
     } else if (qtext === "n/a") {
         return ["n/a"]
     }
     return answers;
 }
 
-
-class QueryAndResponse {
-    constructor(qtext) {
-        this.qtext = qtext;
-        this.answers = getFakeAnswers(qtext);
-    }
-
-    getFirstAnswer() {
-        return this.answers[0];
-    }
+function createFakeQR(qtext) {
+    return new QueryAndResponse(qtext, getFakeAnswers(qtext));
 }
 
-function QATab({question_info}) {
+
+
+var q1 = "How do I install PyTorch?";
+var q2 = "How do I know if PyTorch is installed?";
+var qr1 = new QueryAndResponse(q1, getFakeAnswers(q1));
+var qr2 = new QueryAndResponse(q2, getFakeAnswers(q2));
+function SituationSpecificQA({displayQuestion}) {
+
+
+    // considered maxHeight: 400, overflow:'auto'
+    return(
+      <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
+        <div style={{marginBottom: "10px", textAlign: "center"}}>Situation-specific Q&A</div>
+        {qr1.generateAnswerThumbnail(displayQuestion)}
+        {qr2.generateAnswerThumbnail(displayQuestion)}
+      </Stack>
+    );
+}
+
+function QATab({question_info, stateChangeHandler}) {
+
+    function handleAnswerRemoval() {
+        stateChangeHandler();
+    }
 
     return (
-        <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
+        <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
         <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-            <QAList qtext={question_info.qtext} answers={question_info.answers}/>
+        {question_info.generateAnswerList(handleAnswerRemoval)}
+
       </Stack>
       </Stack>
       );
@@ -174,7 +279,7 @@ return(
         onKeyPress={(ev) => {
         console.log(`Pressed keyCode ${ev.key}`);
           if (ev.key === 'Enter') {
-            displayQuestion(ev.target.value);
+            displayQuestion(createFakeQR(ev.target.value));
           }
         }}
         InputProps={{
@@ -245,20 +350,33 @@ const CurrentState = () => (
 
 function TabMaster() {
   const [tabValue, setTabValue] = React.useState(0);
-  const [questionInfo, setQIValue] = React.useState(new QueryAndResponse('n/a'));
+  const [questionInfo, setQIValue] = React.useState(new QueryAndResponse('n/a', getFakeAnswers('n/a')));
+  const [questionState, setQuestionState] = React.useState(0);
   const [questionHistory, setQHValue] = React.useState([]);
+
 
   function handleTabChange(event, newValue) {
     setTabValue(newValue);
   }
 
-  function displayQuestion(qtext) {
+  function handleQuestionStateChange() {
+    setQuestionState(questionState + 1);
+  }
+
+  function displayQuestion(qr) {
     setTabValue(1); // 1 is just the hard-coded value of the Q & A pane
-    var qr = new QueryAndResponse(qtext);
     setQIValue(qr);
-    if (!questionHistory.includes(qr)) {
-        questionHistory.unshift(qr);
+    var seenAlready = -1;
+    questionHistory.forEach(function (item, index) {
+        if (qr.matches(item)) {
+            seenAlready = index;
+        }
+    });
+    if (seenAlready >= 0) {
+        // Remove it so we can put it at the top of the list
+        questionHistory.splice(seenAlready, 1);
     }
+    questionHistory.unshift(qr);
     setQHValue(questionHistory);
   }
 
@@ -279,7 +397,7 @@ function TabMaster() {
         <MainDisplayPane displayQuestion={displayQuestion}/>
       </div>
       <div role="tabpanel" hidden={tabValue !== 1} id={`simple-tabpanel-1`}>
-        <QATab question_info={questionInfo}/>
+        <QATab question_info={questionInfo} stateChangeHandler={handleQuestionStateChange}/>
       </div>
       <div role="tabpanel" hidden={tabValue !== 2} id={`simple-tabpanel-2`}>
         <QueryHistoryTab questionHistory={questionHistory} displayQuestion={displayQuestion}/>
@@ -297,7 +415,7 @@ function MainDisplayPane({displayQuestion}) {
     }, [setErrorState]);
 
     return (
-     <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400}}>
+     <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
         <CurrentState />
         <EasyAskBox errorState={errorState} stateChanger={wrapperSetErrorState} displayQuestion={displayQuestion}/>
         <SituationSpecificQA displayQuestion={displayQuestion}/>
