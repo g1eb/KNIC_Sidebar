@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
+import Dialog from '@mui/material/Dialog';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -25,6 +26,8 @@ import Tab from '@mui/material/Tab';
 import Slider from '@mui/material/Slider';
 import '@fontsource/roboto/300.css';
 import TokenizeScreenshot from './images/rtg-tokenize.png'
+import NodeGraph from './NodeGraph.js';
+import {NodeGraphKey} from './NodeGraph.js';
 
 const PageContents = () => (
   <div style={{padding: "10px"}}>
@@ -272,20 +275,68 @@ class IndexNode {
                 <div>{this.node_name}</div>
                 <Slider defaultValue={this.score} step={1} marks min={0} max={5}/>
                 </Stack>
+                <Stack direction='row' alignItems='center'>
                 <ButtonGroup>
-                <Button variant="outlined"><ManageSearchIcon/></Button>
+                <NodeGraphDialog icon={returnManageSearchIcon}/>
+                <div>
                 <Button variant="outlined" color="error" onClick={removeHandler}><HighlightOffIcon/></Button>
+                </div>
                 </ButtonGroup>
+                </Stack>
               </Stack>
         );
     }
 }
 
 var nodeList = [
+    new IndexNode("RTG", 5),
     new IndexNode("Python", 4),
-    new IndexNode("machine translation", 3),
-    new IndexNode("data preparation", 3),
+    new IndexNode("tokenize parallel data", 3),
 ];
+
+function fullNodeGraphDisplay() {
+return (
+<Stack alignItems="center" >
+        <NodeGraph />
+        <NodeGraphKey />
+      </Stack>
+      );
+}
+
+function NodeGraphDialog({icon}) {
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = (value) => {
+    setOpen(false);
+  };
+
+  return (
+    <div>
+      <Button variant="outlined" onClick={handleClickOpen}>{icon()}</Button>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        fullScreen
+        style={{padding: "50px", width: 600}}
+      >
+      {fullNodeGraphDisplay()}
+      </Dialog>
+    </div>
+  );
+}
+
+function returnAddIcon() {
+return (<AddIcon />);
+}
+
+function returnManageSearchIcon() {
+return (<ManageSearchIcon />);
+}
+
 
 // TODO: Add "add" functionality
 function CurrentState() {
@@ -304,7 +355,7 @@ function CurrentState() {
       <AccordionDetails>
         <Stack>
           {nodeList.map((indexNode, index) => indexNode.displayIndexNode(handleNodeRemoval, index))}
-          <Stack alignItems="center" mt={2}><Button variant="outlined"><AddIcon /></Button></Stack>
+          <Stack alignItems="center" mt={1}><NodeGraphDialog icon={returnAddIcon}/></Stack>
         </Stack>
       </AccordionDetails>
       </Accordion>
