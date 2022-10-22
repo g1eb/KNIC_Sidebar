@@ -19,11 +19,12 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import AddIcon from '@mui/icons-material/Add';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import Slider from '@mui/material/Slider';
 import '@fontsource/roboto/300.css';
 import TokenizeScreenshot from './images/rtg-tokenize.png'
-import TableDemo from "./TableDemo";
 
 const PageContents = () => (
   <div style={{padding: "10px"}}>
@@ -254,22 +255,61 @@ return(
     );
 }
 
-// TODO Replace CurrentStateItem with something better!
+// TODO make these smaller
 
-const CurrentStateItem = (props) => (
-    <Button variant="outlined" color={props.color} key={props.key} style={{color: props.color}} >{props.text}</Button>
-);
 
-const CurrentState = () => (
-  <Accordion>
-  <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-     Current State
-  </AccordionSummary>
-  <AccordionDetails>
-  <TableDemo/>
-  </AccordionDetails>
-  </Accordion>
-);
+class IndexNode {
+    constructor(node_name, score) {
+        this.node_name = node_name;
+        this.score = score;
+    }
+
+    displayIndexNode(removeHandler, index) {
+
+        return (
+            <Stack direction='row' spacing={1} justifyContent='space-between'>
+                <Stack sx={{width: 200}}>
+                <div>{this.node_name}</div>
+                <Slider defaultValue={this.score} step={1} marks min={0} max={5}/>
+                </Stack>
+                <ButtonGroup>
+                <Button variant="outlined"><ManageSearchIcon/></Button>
+                <Button variant="outlined" color="error" onClick={removeHandler}><HighlightOffIcon/></Button>
+                </ButtonGroup>
+              </Stack>
+        );
+    }
+}
+
+var nodeList = [
+    new IndexNode("Python", 4),
+    new IndexNode("machine translation", 3),
+    new IndexNode("data preparation", 3),
+];
+
+// TODO: Add "add" functionality
+function CurrentState() {
+    const [helper, setHelperValue] = React.useState(0);
+
+    function handleNodeRemoval(index) {
+        nodeList.splice(index, 1);
+        setHelperValue(helper + 1);
+    }
+
+    return (
+      <Accordion>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+         Current State
+      </AccordionSummary>
+      <AccordionDetails>
+        <Stack>
+          {nodeList.map((indexNode, index) => indexNode.displayIndexNode(handleNodeRemoval, index))}
+          <Stack alignItems="center" mt={2}><Button variant="outlined"><AddIcon /></Button></Stack>
+        </Stack>
+      </AccordionDetails>
+      </Accordion>
+  );
+}
 
 function TabMaster() {
   const [tabValue, setTabValue] = React.useState(0);
