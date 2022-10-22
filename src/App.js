@@ -245,6 +245,7 @@ return(
         console.log(`Pressed keyCode ${ev.key}`);
           if (ev.key === 'Enter') {
             displayQuestion(createFakeQR(ev.target.value));
+            ev.target.value="";
           }
         }}
         InputProps={{
