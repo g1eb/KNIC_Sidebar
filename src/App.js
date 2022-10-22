@@ -350,7 +350,7 @@ function CurrentState() {
     return (
       <Accordion>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-         Current State
+         Context
       </AccordionSummary>
       <AccordionDetails>
         <Stack spacing={3}>
