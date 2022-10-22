@@ -2,7 +2,7 @@ import './App.css';
 import React from "react";
 import { useCallback } from "react";
 import Stack from '@mui/material/Stack';
-//import Grid from '@mui/material/Grid';
+import LinearProgress from '@mui/material/LinearProgress';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
@@ -15,7 +15,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import ErrorIcon from '@mui/icons-material/Error';
-//import CancelIcon from '@mui/icons-material/Cancel';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
@@ -23,7 +22,6 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import AddIcon from '@mui/icons-material/Add';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Slider from '@mui/material/Slider';
 import '@fontsource/roboto/300.css';
 import TokenizeScreenshot from './images/rtg-tokenize.png'
 import NodeGraph from './NodeGraph.js';
@@ -268,13 +266,14 @@ class IndexNode {
         this.score = score;
     }
 
+    // <Slider defaultValue={this.score} step={1} marks min={0} max={5}/>
     displayIndexNode(removeHandler, index) {
 
         return (
             <Stack direction='row' spacing={1} justifyContent='space-between'>
-                <Stack sx={{width: 200}}>
+                <Stack sx={{width: 200}} spacing={1}>
                 <div>{this.node_name}</div>
-                <Slider defaultValue={this.score} step={1} marks min={0} max={5}/>
+                <LinearProgress variant="determinate" color='success' value={this.score} sx={{height: '8px'}}/>
                 </Stack>
                 <Stack direction='row' alignItems='center'>
                 <ButtonGroup>
@@ -290,9 +289,9 @@ class IndexNode {
 }
 
 var nodeList = [
-    new IndexNode("RTG", 5),
-    new IndexNode("Python", 4),
-    new IndexNode("tokenize parallel data", 3),
+    new IndexNode("RTG", 100),
+    new IndexNode("Python", 80),
+    new IndexNode("tokenize bitext", 60),
 ];
 
 function fullNodeGraphDisplay() {
@@ -354,9 +353,11 @@ function CurrentState() {
          Current State
       </AccordionSummary>
       <AccordionDetails>
-        <Stack>
+        <Stack spacing={3}>
+        <Stack spacing={1}>
           {nodeList.map((indexNode, index) => indexNode.displayIndexNode(handleNodeRemoval, index))}
-          <Stack alignItems="center" mt={1}><NodeGraphDialog icon={returnAddIcon}/></Stack>
+        </Stack>
+        <Stack alignItems="center"><NodeGraphDialog icon={returnAddIcon}/></Stack>
         </Stack>
       </AccordionDetails>
       </Accordion>
