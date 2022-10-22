@@ -6,16 +6,16 @@ import Box from '@mui/material/Box';
 var data = {
   nodes: [{ id: "Python" , "group": "concept"},
           { id: "RTG", "group": "task" },
-          { id: "download parallel data", "group": "task" },
-          { id: "download dataset", "group": "task" },
-          { id: "tokenize parallel data", "group": "task" },
+          { id: "download bitext", "group": "task" },
+          { id: "download datasets", "group": "task" },
+          { id: "tokenize bitext", "group": "task" },
           ],
   links: [
-    { source: "Python", target: "tokenize parallel data", label: "related"},
-    { source: "download dataset", target: "download parallel data", label: "includes"},
-    { source: "RTG", target: "download parallel data", label: "includes"},
-    { source: "RTG", target: "tokenize parallel data", label: "includes"},
-    { source: "download parallel data", target: "tokenize parallel data", label: "precedes"},
+    { source: "Python", target: "tokenize bitext", label: "related"},
+    { source: "download datasets", target: "download bitext", label: "includes"},
+    { source: "RTG", target: "download bitext", label: "includes"},
+    { source: "RTG", target: "tokenize bitext", label: "includes"},
+    { source: "download bitext", target: "tokenize bitext", label: "precedes"},
   ]
 };
 
