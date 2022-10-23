@@ -20,7 +20,7 @@ export function getFakeAnswers(qtext) {
                  "PyTorch 1.10 does not support CUDA 11.5. Lower your CUDA to 11.3.1",
                  "I had the same issue, and what I noticed is that I was using Python 3.8.1 and the latest PyTorch was for Python 3.7. I uninstalled Python 3.8.1 and installed 3.7.6 and voila, it worked!"
                  ];
-    } else if (qtext === 'What version of torch do I want?') {
+    } else if (qtext === 'What version of torch do I want?' || qtext === 'What version of pytorch do I want?') {
         answers=["torch 1.12.1+cu113"];
     } else if (qtext === "n/a") {
         return ["n/a"];
