@@ -1,5 +1,6 @@
 import QueryAndResponse from './QueryAndResponse.js';
 
+// Hard-coded answers to queries
 export function getFakeAnswers(qtext) {
     var answers=['This is a placeholder answer for illustration purposes.'];
     if (qtext === "How do I install PyTorch?") {
@@ -28,6 +29,7 @@ export function getFakeAnswers(qtext) {
     return answers;
 }
 
+// Create a QueryAndResponse object with faked answers for a given query text
 export function createFakeQR(qtext) {
     return new QueryAndResponse(qtext, getFakeAnswers(qtext));
 }

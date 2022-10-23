@@ -7,6 +7,7 @@ class EasyAskQuestion  {
 
     constructor(qtext, status) {
         this.qtext = qtext;
+        // This somewhat conflates status and color; currently using success/error which are also color themes in MUI
         this.status = status;
         this.qr = createFakeQR(qtext);
     }
@@ -14,8 +15,8 @@ class EasyAskQuestion  {
     createButton(displayQuestion) {
         return(
             <Button variant="outlined" color={this.status} key={this.qtext}
-            style={{color: this.status}}
-            onClick={() => displayQuestion(this.qr)}>{this.qtext}</Button>
+              style={{color: this.status}}
+              onClick={() => displayQuestion(this.qr)}>{this.qtext}</Button>
         );
 
     }
@@ -31,9 +32,9 @@ const easyAskQuestions = [
 ]
 
 function ChangeStateButton ({color, key, text, onClick}) {
-return(
+  return(
     <Button variant="contained" color={color} key="changestate" style={{color: color}} onClick={onClick}>{text}</Button>
-    );
+  );
 }
 
 export default function EasyAskBox({errorState, stateChanger, displayQuestion}) {
@@ -45,7 +46,7 @@ export default function EasyAskBox({errorState, stateChanger, displayQuestion}) 
             {buttons.map(eaq => eaq.createButton(displayQuestion))}
             <ChangeStateButton color='success' text={"I'm not having any problems."} onClick={() => stateChanger(0)} />
           </Stack>
-          );
+        );
     } else {
         const buttons = easyAskQuestions.filter(eaq => eaq.status === 'success');
         return (
@@ -53,6 +54,6 @@ export default function EasyAskBox({errorState, stateChanger, displayQuestion}) 
             {buttons.map(eaq => eaq.createButton(displayQuestion))}
             <ChangeStateButton color='error' text={"I'm having a problem."} onClick={() => stateChanger(1)}/>
           </Stack>
-          );
+        );
      }
 }

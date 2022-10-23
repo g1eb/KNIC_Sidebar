@@ -18,14 +18,14 @@ const Answer = (props) => (
 
 // Full answer display (for Q&A tab)
 const FullAnswer = (props) => (
-<Stack direction='row' spacing={1} justifyContent='space-between'>
-    <Answer text={props.text} />
-    <ButtonGroup orientation='vertical'>
-    <Button variant="outlined" color="error" onClick={props.removeHandler}><HighlightOffIcon/></Button>
-    <Button variant="outlined"><QuestionMarkIcon/></Button>
-    <Button variant="outlined"><ManageSearchIcon/></Button>
-    </ButtonGroup>
-  </Stack>
+    <Stack direction='row' spacing={1} justifyContent='space-between'>
+        <Answer text={props.text} />
+        <ButtonGroup orientation='vertical'>
+            <Button variant="outlined" color="error" onClick={props.removeHandler}><HighlightOffIcon/></Button>
+            <Button variant="outlined"><QuestionMarkIcon/></Button>
+            <Button variant="outlined"><ManageSearchIcon/></Button>
+        </ButtonGroup>
+    </Stack>
 );
 
 // Class to hold a query and its responses. Maintains state! Answers can be deleted.
@@ -58,13 +58,13 @@ export default class QueryAndResponse {
         // ButtonGroup makes the single button not get mega tall
         return (
           <Stack direction='row' spacing={1} justifyContent='space-between'>
-          <Stack spacing={1}>
-            <Question text={this.qtext}/>
-            <Answer text={shortText}/>
-          </Stack>
-          <ButtonGroup orientation='vertical'>
-          <Button variant="outlined" onClick={() => displayQuestion(this)}><ZoomInIcon /></Button>
-          </ButtonGroup>
+              <Stack spacing={1}>
+                <Question text={this.qtext}/>
+                <Answer text={shortText}/>
+              </Stack>
+              <ButtonGroup orientation='vertical'>
+                <Button variant="outlined" onClick={() => displayQuestion(this)}><ZoomInIcon /></Button>
+              </ButtonGroup>
           </Stack>
         );
     }

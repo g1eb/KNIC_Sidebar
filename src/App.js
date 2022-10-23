@@ -15,6 +15,7 @@ import QueryAndResponse from './QueryAndResponse.js';
 import CurrentState from './Context.js';
 import {getFakeAnswers, createFakeQR} from './FakeQR.js';
 
+// Contents to the right of the TA-D sidebar, just a static screenshot for now
 const PageContents = () => (
   <div style={{padding: "10px"}}>
     <img src={TorchScreenshot} alt="RTG screenshot"/>
@@ -47,7 +48,7 @@ var q2 = "How do I know if PyTorch is installed?";
 var qr1 = new QueryAndResponse(q1, getFakeAnswers(q1));
 var qr2 = new QueryAndResponse(q2, getFakeAnswers(q2));
 function ContextSpecificQA({displayQuestion}) {
-    // considered maxHeight: 400, overflow:'auto'
+    // considered maxHeight: 400, overflow:'auto' but decided against it, too weird for demo
     return(
       <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
         <div style={{marginBottom: "10px", textAlign: "center"}}>Context-specific Q&A</div>
@@ -60,7 +61,8 @@ function ContextSpecificQA({displayQuestion}) {
 // Sub-portion of Main Display Pane
 function CustomSearchField({displayQuestion}) {
 
-return(
+  // Copied from online somewhere in large part
+  return(
     <TextField
         type="search"
         variant="outlined"
@@ -80,7 +82,7 @@ return(
           )
         }}
     />
-    );
+  );
 }
 
 // Tab #1: Q&A
@@ -102,8 +104,8 @@ function QueryHistoryTab({questionHistory, displayQuestion}) {
 return (
   <Stack bgcolor="lightgray" spacing={2} style={{padding: "10px", margin: "10px", width: 400, minHeight: 800}}>
     <Stack bgcolor="white" spacing={2} style={{padding: "10px", borderRadius: '16px'}}>
-    {questionHistory.map(qr => qr.generateAnswerThumbnail(displayQuestion))}
-  </Stack>
+      {questionHistory.map(qr => qr.generateAnswerThumbnail(displayQuestion))}
+    </Stack>
   </Stack>
   );
 }
@@ -114,7 +116,6 @@ function TabMaster() {
   const [questionInfo, setQIValue] = React.useState(new QueryAndResponse('n/a', getFakeAnswers('n/a')));
   const [questionState, setQuestionState] = React.useState(0);
   const [questionHistory, setQHValue] = React.useState([]);
-
 
   function handleTabChange(event, newValue) {
     setTabValue(newValue);
@@ -144,11 +145,7 @@ function TabMaster() {
   return (
   <div>
       <Box centered sx={{alignItems: 'center', width: 400}}>
-        <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          centered
-        >
+        <Tabs value={tabValue} onChange={handleTabChange} centered>
           <Tab label="Main" id="simple-tabpanel-0" />
           <Tab label="Q & A" id="simple-tabpanel-1" />
           <Tab label="Query History" id="simple-tabpanel-2" />
@@ -163,7 +160,7 @@ function TabMaster() {
       <div role="tabpanel" hidden={tabValue !== 2} id={`simple-tabpanel-2`}>
         <QueryHistoryTab questionHistory={questionHistory} displayQuestion={displayQuestion}/>
       </div>
-      </div>
+  </div>
   );
 }
 

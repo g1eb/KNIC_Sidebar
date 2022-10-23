@@ -20,28 +20,31 @@ class IndexNode {
         this.score = score;
     }
 
+    // Considered a slider that could be adjustable, but I don't think the user will want to do this
     // <Slider defaultValue={this.score} step={1} marks min={0} max={5}/>
     displayIndexNode(removeHandler, index) {
 
+        // This uses a div around the second button solely to make it line up with the button in the NodeGraphDialog
         return (
             <Stack direction='row' spacing={1} justifyContent='space-between'>
                 <Stack sx={{width: 200}} spacing={1}>
-                <div>{this.node_name}</div>
-                <LinearProgress variant="determinate" color='success' value={this.score} sx={{height: '8px'}}/>
+                  <div>{this.node_name}</div>
+                  <LinearProgress variant="determinate" color='success' value={this.score} sx={{height: '8px'}}/>
                 </Stack>
                 <Stack direction='row' alignItems='center'>
-                <ButtonGroup>
-                <NodeGraphDialog icon={returnManageSearchIcon}/>
-                <div>
-                <Button variant="outlined" color="error" onClick={removeHandler}><HighlightOffIcon/></Button>
-                </div>
-                </ButtonGroup>
+                  <ButtonGroup>
+                    <NodeGraphDialog icon={returnManageSearchIcon}/>
+                    <div>
+                      <Button variant="outlined" color="error" onClick={removeHandler}><HighlightOffIcon/></Button>
+                    </div>
+                  </ButtonGroup>
                 </Stack>
               </Stack>
         );
     }
 }
 
+// Hard-coded list of nodes in our context
 var nodeList = [
     new IndexNode("RTG", 100),
     new IndexNode("Python", 80),
@@ -50,12 +53,12 @@ var nodeList = [
 ];
 
 function fullNodeGraphDisplay() {
-return (
-<Stack alignItems="center" >
-        <NodeGraph />
-        <NodeGraphKey />
+    return (
+      <Stack alignItems="center" >
+            <NodeGraph />
+            <NodeGraphKey />
       </Stack>
-      );
+    );
 }
 
 function NodeGraphDialog({icon}) {
@@ -102,17 +105,17 @@ export default function CurrentState() {
 
     return (
       <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-         Context
-      </AccordionSummary>
-      <AccordionDetails>
-        <Stack spacing={3}>
-        <Stack spacing={1}>
-          {nodeList.map((indexNode, index) => indexNode.displayIndexNode(handleNodeRemoval, index))}
-        </Stack>
-        <Stack alignItems="center"><NodeGraphDialog icon={returnAddIcon}/></Stack>
-        </Stack>
-      </AccordionDetails>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+             Context
+          </AccordionSummary>
+          <AccordionDetails>
+            <Stack spacing={3}>
+                <Stack spacing={1}>
+                  {nodeList.map((indexNode, index) => indexNode.displayIndexNode(handleNodeRemoval, index))}
+                </Stack>
+                <Stack alignItems="center"><NodeGraphDialog icon={returnAddIcon}/></Stack>
+            </Stack>
+          </AccordionDetails>
       </Accordion>
   );
 }
