@@ -6,4 +6,8 @@ KNIC Sidebar Project.
  2) @mui/lab
  3) react-force-graph-2d
  
- (Installing means run "npm install [foo]".)
+ (Installing means run `npm install [foo]`.)
+ 
+ # Starting the project
+ 
+ Just run `npm start`. The app will appear at `http://localhost:3000/`.
