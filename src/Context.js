@@ -35,7 +35,7 @@ class IndexNode {
                   <ButtonGroup>
                     <NodeGraphDialog icon={returnManageSearchIcon}/>
                     <div>
-                      <Button variant="outlined" color="error" onClick={removeHandler}><HighlightOffIcon/></Button>
+                      <Button variant="outlined" color="error" onClick={() => removeHandler(index)}><HighlightOffIcon/></Button>
                     </div>
                   </ButtonGroup>
                 </Stack>
