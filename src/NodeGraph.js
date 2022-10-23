@@ -6,16 +6,16 @@ import Box from '@mui/material/Box';
 var data = {
   nodes: [{ id: "Python" , "group": "concept"},
           { id: "RTG", "group": "task" },
-          { id: "download bitext", "group": "task" },
-          { id: "download datasets", "group": "task" },
-          { id: "tokenize bitext", "group": "task" },
+          { id: "environment validation", "group": "task" },
+          { id: "install pytorch", "group": "task" },
+          { id: "validate torch install", "group": "task" },
           ],
   links: [
-    { source: "Python", target: "tokenize bitext", label: "related"},
-    { source: "download datasets", target: "download bitext", label: "includes"},
-    { source: "RTG", target: "download bitext", label: "includes"},
-    { source: "RTG", target: "tokenize bitext", label: "includes"},
-    { source: "download bitext", target: "tokenize bitext", label: "precedes"},
+    { source: "Python", target: "validate torch install", label: "related"},
+    { source: "install pytorch", target: "validate torch install", label: "precedes"},
+    { source: "RTG", target: "install pytorch", label: "includes"},
+    { source: "RTG", target: "validate torch install", label: "includes"},
+    { source: "environment validation", target: "validate torch install", label: "includes"},
   ]
 };
 
